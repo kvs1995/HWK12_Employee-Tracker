@@ -1,0 +1,29 @@
+{
+  "name": "hwk12_employee-tracker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kvs1995/HWK12_Employee-Tracker.git"
+  },
+  "author": "Kendall Swanson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kvs1995/HWK12_Employee-Tracker/issues"
+  },
+  "homepage": "https://github.com/kvs1995/HWK12_Employee-Tracker#readme",
+  "dependencies": {
+    "asciiart-logo": "^0.2.6",
+    "console.table": "^0.10.0",
+    "inquirer": "^8.2.0",
+    "mysql2": "^2.3.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}

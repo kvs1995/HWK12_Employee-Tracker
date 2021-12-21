@@ -31,14 +31,14 @@ const lezgo = async() => {
     //     }
     //     console.log(result);
     // }
-    db.query(`${testQuery}`, tryUno,  (err, result) => {
+    db.query(testQuery, tryUno,  (err, result) => {
         if (err) {
             console.log(err);
         }
         console.log(result);
     })
 
-    db.query(`${selectEmp}`, (err, result) => {
+    db.query(selectEmp, (err, result) => {
     if (err) {
         console.log(err);
     }

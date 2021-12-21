@@ -1,5 +1,12 @@
 //require mysql2, express, utls, asiiart-logo, console.table, inquirer.
+const express = require('express')
+const mysql = require('mysql2')
+const inquirer = require('inquirer')
+const consoleTable = require('console.table')
+const asciiart = require('asciiart-logo')
 
+//potentially require the utils for the sql query
+// const { util,queries } = require('./helpers/utils')
 
 //create the db connection
 

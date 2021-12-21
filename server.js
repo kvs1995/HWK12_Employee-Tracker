@@ -25,19 +25,27 @@ const db = mysql.createConnection(
 const lezgo = async() => {
 
     const tryUno =  await init();
-    db.query(`${testQuery}${tryUno}${endParan}`),  (err, result) => {
+    // db.query(`${testQuery}${tryUno}${endParan}`),  (err, result) => {
+    //     if (err) {
+    //         console.log(err);
+    //     }
+    //     console.log(result);
+    // }
+    db.query(testQuery, tryUno,  (err, result) => {
         if (err) {
             console.log(err);
         }
         console.log(result);
-    }
+    })
 
-    db.query(`${selectEmp}`, (err, result) => {
+    db.query(selectEmp, (err, result) => {
     if (err) {
         console.log(err);
     }
     console.log(result);
     });
+
+    waitPlease()
 }
 
 const waitPlease = async() => {

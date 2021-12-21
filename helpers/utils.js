@@ -9,5 +9,5 @@ const testQuery = 'INSERT INTO employee (first_name) VALUES (?)'
 //ending paratheses
 const endParan = '")'
 //select * f
-const selectEmp= `SELECT * from employee`
-module.exports = { testQuery, selectEmp, endParan }
+const viewAllSelect= 'SELECT * from ??'
+module.exports = { viewAllSelect }

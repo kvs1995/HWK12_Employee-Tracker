@@ -1,9 +1,43 @@
+//require mysql2, express, utls, asiiart-logo, console.table, inquirer.
+
+
+//create the db connection
+
+//error handling for the db connection
+
+//initial prompt - choose action. 
+
+//create functions for each option, use .separator() option inbetween each action to keep it clean
+
+//view alls
+//view all employees
+
+//view all roles
+
+//view all departments
+
+//add options
+//add employee
+
+//add role
+
+//add department
+
+//update employee role
+
+//quit --> use db.quit
+
+
+//init function 
+
+//export init
+
 const express = require('express')
 // import and requre mysql
 const mysql = require('mysql2')
 const { testQuery, selectEmp,endParan } = require('./helpers/utils')
 // const test = require('./assets/index');
-const init = require('./assets/index');
+// const init = require('./index');
 const PORT = process.env.PORT || 3001;
 const app = express();
 

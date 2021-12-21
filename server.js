@@ -9,8 +9,33 @@ const asciiart = require('asciiart-logo')
 // const { util,queries } = require('./helpers/utils')
 
 //create the db connection
+const PORT = process.env.PORT || 3001;
+const app = express();
 
-//error handling for the db connection
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+
+const db = mysql.createConnection(
+    {
+        host: 'localhost',
+        user: 'root',
+        password:'Password1',
+        database:'employee_db'
+    },
+
+    //error handling for the db connection
+    db.connect(err => {
+        if (err) {
+            console.error(err);
+        } else {
+                    //otherwise initial options prompt
+            console.log(`Connected to the employee_db database`);
+        }
+
+    })
+
+);
+
 
 //initial prompt - choose action. 
 
@@ -39,29 +64,7 @@ const asciiart = require('asciiart-logo')
 
 //export init
 
-const express = require('express')
-// import and requre mysql
-const mysql = require('mysql2')
-const { testQuery, selectEmp,endParan } = require('./helpers/utils')
-// const test = require('./assets/index');
-// const init = require('./index');
-const PORT = process.env.PORT || 3001;
-const app = express();
 
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
-
-//create mysql connection 
-const db = mysql.createConnection(
-    {
-        host: 'localhost',
-        user: 'root',
-        password:'Password1',
-        database:'employee_db'
-    },
-    //log to console once the database is connected
-    console.log(`Connected to the employee_db database`)
-);
 
 const lezgo = async() => {
 

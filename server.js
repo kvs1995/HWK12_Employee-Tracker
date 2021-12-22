@@ -6,7 +6,8 @@ const consoleTable = require('console.table')
 const asciiart = require('asciiart-logo')
 
 //potentially require the utils for the sql query
-const { viewAllSelect } = require('./helpers/utils')
+const { empMiddle,empUpdateFirst, empUpdateSecond,countEmp, viewAllSelect, whereRoleSelect, whereDeptSelect, empInsert, deptInsert, roleInsert,  empRoleJoin, empRoleIn} = require('./utils')
+const res = require('express/lib/response')
 
 //create the db connection
 const PORT = process.env.PORT || 3001;
@@ -22,160 +23,339 @@ const db = mysql.createConnection(
         password:'Password1',
         database:'employee_db'
     },
-
-
-
 );
 
 //error handling for the db connection
-db.connect(err => {
-    if (err) {
-        console.error(err);
-    } else {
+db.connect(err => 
+    {
+        if (err) 
+            { console.error(err); } 
+        else {
         //otherwise initial options prompt
-
-        console.log(`Connected to the employee_db database`);
-        initialPrompt();
+            console.log(`Connected to the employee_db database`);
+            initialPrompt();
+        }
     }
+);
 
-});
-let ViewAllTable ='';
-
-// console.log(initialPrompt())
-// const viewAll = async(ViewAllTable) => {
-//     db.query(viewAllSelect, ViewAllTable, (err, result) => {
-//         if (err) {
-//             console.log(err);
-//         }
-//             console.log(result);
-//     });
-// }
-
-//initial prompt - choose action: WHEN I start the application
-// THEN I am presented with the following options: view all departments, view all roles, view all employees, add a department, add a role, add an employee, and update an employee role
+///////////////////////////////////////////////////////
 function initialPrompt() {
-    inquirer.prompt([
+    inquirer.prompt(
+        [
+            {
+                type:'list',
+                loop:false,
+                name:'action',
+                message:'What would you like to do?',
+                choices: ['View all employees', 'View all roles','View all departments','Add employee',  'Add role', 'Add department','Update employee role', 'Quit']
+            }
+        ]
+    )
+    .then(selectedOption => 
         {
-            type:'list',
-            name:'action',
-            message:'What would you like to do?',
-            choices: ['View all employees', 'Add employee', 'Update employee role', 'View all roles', 'Add role', 'View all departments', 'Add department', 'Quit']
+            switch(selectedOption.action) {
+                case 'View all employees': viewAll('employee');
+                    break;
+                case 'View all roles': viewAll('role');
+                    break;
+                case 'View all departments': viewAll('department');
+                    break;
+                case 'Add employee': addEmployee();
+                    break;
+                case 'Add role': addRole();
+                    break;
+                case 'Add department': addDepartment();
+                    break;
+                case 'Update employee role': updateEmployeeRole();
+                    break;
+                case 'Quit': db.end();
+                    break;
+            }
         }
-    ])
-
-    .then(selectedOption => {
-        // console.log(selectedOption.action)
-        switch (selectedOption.action) {
-            case 'View all employees':
-                //couple options: put a function here or set the sql string to the select statment + a set variable 'employee'. 
-                ViewAllTable = 'employee'
-                // console.log(ViewAllTable)
-                viewAll(ViewAllTable)
-                break;                
-            case 'View all roles': 
-                ViewAllTable = 'role'
-                viewAll(ViewAllTable)
-                break;
-            case 'View all departments':  
-                ViewAllTable = 'department'
-                viewAll(ViewAllTable)
-            case 'Add employee':
-                return;
-            case 'Add role':
-                return;
-            case 'Add department':
-                return;
-
-            case 'Update employee role':
-                return;
-
-            case 'Quit':
-                db.end();
-                break;
-        }
-    })
-
-
+    )
 };
 
 
-//create functions for each option, use .separator() option inbetween each action to keep it clean
-
-//view alls
-// console.log(initialPrompt())
-const viewAll = async(ViewAllTable) => {
-    db.query(viewAllSelect, ViewAllTable, (err, result) => {
-        if (err) {
-            console.log(err);
+/////////////////////////////////////////////////////
+const viewAll = async(table) => {
+    db.query(viewAllSelect,table, (err,result) => 
+        {
+            if (err) { console.log(err); }
+            console.table(result);
+            
+            setTimeout(() => initialPrompt(), 2500)
         }
-            console.log(result);
-    });
+    )
 }
 
 
+/////////////////////////////////////////////////////
+const addEmployee = async() => {
+    db.query(viewAllSelect, 'role', (err, result) => 
+        {
+            if (err) console.error(err);
 
-//add options
-//add employee
+            inquirer.prompt(
+                [
+                    {
+                        type: 'input',
+                        name: 'firstName',
+                        message: 'What is the employee\'s first name?'
+                    },
+                    {
+                        type:'input',
+                        name:'lastName',
+                        message:'What is the employee\'s last name?',
+                    },
+                    {
+                        type: 'list',
+                        name: 'role',
+                        message: 'What is the employee\'s role? Please select an option below.',
+                        choices: function() {
+                            let choicesList = [];
+                            for (let i = 0; i < result.length; i++) {
+                                choicesList.push(result[i].title)
+                            };
+                            return choicesList;
+                        }
+                    }
+                ]
+            )
+            .then(answers => 
+                {
+                    let {firstName, lastName, role } = answers
+                    db.query(whereRoleSelect, role, (err, result) =>
+                        {
+                            if (err) console.error(err);
+                            const role_id = result[0].id;
 
-//add role
-
-//add department
-
-//update employee role
-
-//quit --> use db.quit
-
-
-// init function 
-const init = async() => {
-    const initialPrompt = {
-        type:'list',
-        name:'action',
-        message:'What would you like to do?',
-        choices: ['View all employees', 'Add employee', 'Update employee role', 'View all roles', 'Add role', 'View all departments', 'Add department', 'Quit']
+                            db.query(empInsert,[firstName,lastName,role_id], (err, result) => 
+                                {
+                                    if(err) 
+                                        {console.error(err);}
+                                    else {
+                                        console.log('Employee successfully added!')
+                                        initialPrompt();
+                                        // viewAll('employee')
+                                    }
+                                }
+                            )
+                        }
+                    )
+                }
+            )
         }
-    const selectedOption = await inquirer.prompt(initialPrompt)
+    )
+}
 
-    
-};
+//////////////////////////////////////////////////////
 
-//export init
+const addRole = async() => {
+    db.query(viewAllSelect, 'department', (err, result) =>
+        {
+            if (err) console.error(err);
+            console.log(viewAllSelect)
+
+            inquirer.prompt(
+                [
+                    {
+                        type: 'input',
+                        name:'title',
+                        message: 'What is the name of the role?'
+                    },
+                    {
+                        type:'number',
+                        name:'salary',
+                        message: 'What is the salary of the role?'
+                    },
+                    {
+                        type:'list',
+                        name:'department',
+                        message:'Which department does the role belong to?',
+                        choices: function() {
+                            let choicesList = []
+                            for (let i = 0; i < result.length; i++) {
+                                choicesList.push(result[i].name)
+                                
+                            };
+                            return choicesList;
+                        }
+                    }
+                ]
+            )
+            .then(answers => 
+                {
+                    let { title, salary, department } = answers
+                    db.query(whereDeptSelect, department, (err, result) => 
+                        {
+                            if (err) console.error(err);
+                            const department_id = result[0].id
+
+                            db.query(roleInsert, [title, salary, department_id], (err, result) => 
+                                {
+                                    if (err) console.error(err);
+                                    else {
+                                        console.log(`Successfully added the ${title} role to the database!`)
+                                        // viewAll('role');
+                                        initialPrompt();
+                                    }
+                                }
+                            )
+                        }
+                    )
+                }    
+            )
+        }
+    )
+}
+
+/////////////////////////////////////////////////////
+const addDepartment = async() => {
+    inquirer.prompt(
+        [
+            {
+                type: 'input',
+                name: 'name',
+                message: 'What is the name of the department?'
+            }
+        ]
+    )
+    .then(answers => 
+        {
+            let { name } = answers
+            db.query(deptInsert, name, (err, result) => 
+                {
+                    if (err) {console.error(err);}
+                    else {
+                        console.log(`Department ${name} was successfully added to the database!`)
+                        initialPrompt();
+                    }
+                }
+            )
+        }
+    )
+}
+
+////////////////////////////////////////////////////
+const updateEmployeeRole = async() => {
+    db.query(empRoleJoin, (err, result) => 
+        {
+            inquirer.prompt(
+                [
+                    {
+                        type: 'list',
+                        name: 'employee',
+                        message: 'Which employee\'s role do you want to udpate?',
+                        choices: function() {
+                            let choicesList = []
+                            for (let i = 0; i < result.length; i++) {
+                                choicesList.push(result[i].full_name);
+                            }
+                            return choicesList
+                        }
+                    }
+                ]
+            )
+            .then(answers => 
+                {
+
+                    let first_name = answers.employee.split(' ')[0]
+                    let last_name = answers.employee.split(' ')[1]
+
+                   
+                    db.query(countEmp,[first_name,last_name], (err, result) =>
+                        {  
+                            if (err) console.error(err);
+                            // let updateEmpId = []
+
+                            filterString = ''
+                            for (let i = 0; i < result.length; i++) {
+                                filterString += result[i].id
+
+                                // console.log(i)
+                                if (i !== (result.length - 1)) {
+                                    filterString += ","
+                                }
+                            }
+
+                
+                            
+                            db.query(`${empRoleIn}${filterString})`,(err, result) => 
+                                {   
+                                    if (err) console.error(err);
 
 
+                                    // console.log(result)
+                                    inquirer.prompt(
+                                        [
+                                            {
+                                                type: 'list',
+                                                name: 'originalRole',
+                                                message: `Please specify the role you would like to udpate.`,
+                                                choices: function() {
+                                                    let rolelist = [];
+                                                    for (let i = 0; i < result.length; i++) {
+                                                        rolelist.push(result[i].title)
+                                                    }
+                                                    return rolelist;
+                                                }
+                                            },
 
-// const lezgo = async() => {
+                                        ]
+                                    )                                   
+                                    .then(answers => 
+                                        {
+                                            let originalRole = answers.originalRole
+                                            // console.log(answers.role) 
+                                            // console.log(filterString)
+                                                                                            
+                                            db.query(viewAllSelect, 'role', (err, result) => 
+                                                {
+                                                    if (err) console.error(err);
+                                                    inquirer.prompt(
+                                                        [
+                                                            {
+                                                                type: 'list',
+                                                                name: 'targetRole',
+                                                                message: `Please specify what you would like to update the employee role to.`,
+                                                                choices: function() {
+                                                                    let choicesList = [];
+                                                                    for (let i = 0; i < result.length; i++) {
+                                                                        choicesList.push(result[i].title)
+                                                                    }
+                                                                    return choicesList;
+                                                                }
+                                                            }
+                                                        ]
+                                                    )
+                                                    .then(answers =>
+                                                        {
+                                                            let targetRole = answers.targetRole
+                                                            console.log(targetRole)
+                                                            console.log(originalRole)
+                                                            console.log(filterString)
 
-//     const tryUno =  await init();
-//     // db.query(`${testQuery}${tryUno}${endParan}`),  (err, result) => {
-//     //     if (err) {
-//     //         console.log(err);
-//     //     }
-//     //     console.log(result);
-//     // }
-//     db.query(testQuery, tryUno,  (err, result) => {
-//         if (err) {
-//             console.log(err);
-//         }
-//         console.log(result);
-//     })
-
-//     db.query(selectEmp, (err, result) => {
-//     if (err) {
-//         console.log(err);
-//     }
-//     console.log(result);
-//     });
-
-//     waitPlease()
-// }
-
-// const waitPlease = async() => {
-//     app.use((req, res) => {
-//         res.status(404).end();
-//     });
-//     app.listen(PORT, () => {
-//         console.log(`Server running on port ${PORT}`);
-//     })
-// }
-
-// lezgo();
+                                                            db.query(`${empUpdateFirst}'${targetRole}'${empMiddle}(${filterString})${empUpdateSecond}'${originalRole}')`, (err, result) => 
+                                                                {
+                                                                    if (err) console.error(err)
+                                                                    else {
+                                                                        console.log('success!')
+                                                                        initialPrompt();
+                                                                    }
+                                                                }
+                                                            )
+                                                        }
+                                                    )
+                                                }
+                                            )
+                                        }
+                                    )
+                                } 
+                            )                            
+                        }
+                    )
+                }
+            )
+        }
+    )
+}

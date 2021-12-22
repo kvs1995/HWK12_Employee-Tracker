@@ -38,6 +38,7 @@ db.connect(err =>
     }
 );
 
+console.log(logo(config).render());
 ///////////////////////////////////////////////////////
 function initialPrompt() {
     inquirer.prompt(

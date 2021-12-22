@@ -6,7 +6,7 @@ const consoleTable = require('console.table')
 const asciiart = require('asciiart-logo')
 
 //potentially require the utils for the sql query
-const { empMiddle,empUpdateFirst, empUpdateSecond,countEmp, viewAllSelect, whereRoleSelect, whereDeptSelect, empInsert, deptInsert, roleInsert,  empRoleJoin, empRoleIn} = require('./utils')
+const { empMiddle,empUpdateFirst, empUpdateSecond,countEmp, viewAllSelect, whereRoleSelect, whereDeptSelect, empInsert, deptInsert, roleInsert,  empRoleJoin, empRoleIn} = require('./helpers/utils')
 const res = require('express/lib/response')
 
 //create the db connection

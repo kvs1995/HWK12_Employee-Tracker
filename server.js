@@ -38,7 +38,6 @@ db.connect(err =>
     }
 );
 
-console.log(logo(config).render());
 ///////////////////////////////////////////////////////
 function initialPrompt() {
     inquirer.prompt(
@@ -155,7 +154,7 @@ const addRole = async() => {
     db.query(viewAllSelect, 'department', (err, result) =>
         {
             if (err) console.error(err);
-            console.log(viewAllSelect)
+//             console.log(viewAllSelect)
 
             inquirer.prompt(
                 [
@@ -307,8 +306,6 @@ const updateEmployeeRole = async() => {
                                     .then(answers => 
                                         {
                                             let originalRole = answers.originalRole
-                                            // console.log(answers.role) 
-                                            // console.log(filterString)
                                                                                             
                                             db.query(viewAllSelect, 'role', (err, result) => 
                                                 {
@@ -332,9 +329,6 @@ const updateEmployeeRole = async() => {
                                                     .then(answers =>
                                                         {
                                                             let targetRole = answers.targetRole
-                                                            console.log(targetRole)
-                                                            console.log(originalRole)
-                                                            console.log(filterString)
 
                                                             db.query(`${empUpdateFirst}'${targetRole}'${empMiddle}(${filterString})${empUpdateSecond}'${originalRole}')`, (err, result) => 
                                                                 {
